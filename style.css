@@ -1,0 +1,115 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+    background-image: url('tdl.jpg'); 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat; 
+}
+
+.todo-container {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 450px;
+}
+
+h2 {
+    margin: 0 0 20px;
+    text-align: center;
+}
+
+.input-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+#new-task {
+    width: 70%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#add-btn {
+    width: 25%;
+    background-color: #006D77;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#add-btn:hover {
+    background-color: #83C5BE;
+}
+
+.filter-container {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.filter-btn {
+    background-color: #FF6F59;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.filter-btn:hover {
+    background-color: #FFA08C;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+}
+
+
+.edit-btn, .complete-btn, .delete-btn {
+    background-color: #006D77;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.edit-btn:hover, .complete-btn:hover, .delete-btn:hover {
+    background-color:  #83C5BE;
+}
+li.completed {
+    color: gray; 
+    text-decoration: line-through; 
+    opacity: 0.6; 
+}
+
+li.dragging {
+    opacity: 0.5;
+    background-color: #f1f1f1;
+}
+
+li {
+    cursor: move; /* Change cursor to indicate draggable element */
+}
