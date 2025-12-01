@@ -1,46 +1,51 @@
-// Event listeners
 document.getElementById('add-btn').addEventListener('click', addTask);
 document.getElementById('all-btn').addEventListener('click', () => filterTasks('all'));
 document.getElementById('active-btn').addEventListener('click', () => filterTasks('active'));
 document.getElementById('completed-btn').addEventListener('click', () => filterTasks('completed'));
+document.getElementById('clear-completed-btn').addEventListener('click', clearCompleted);
+document.getElementById('search-input').addEventListener('input', searchTasks);
 
-// Load tasks from localStorage on page load
 window.addEventListener('load', loadTasks);
 
 let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
 function addTask() {
-    const taskText = document.getElementById('new-task').value;
-    if (taskText === '') return;
+    const text = document.getElementById('new-task').value;
+    const date = document.getElementById('task-date').value;
+    const priority = document.getElementById('task-priority').value;
+
+    if (text === '') return;
 
     const task = {
-        id: Date.now(),  // Unique ID for each task
-        text: taskText,
-        completed: false
+        id: Date.now(),
+        text,
+        completed: false,
+        priority,
+        date
     };
 
     tasks.push(task);
     saveTasks();
     renderTasks();
 
-    // Clear input field
     document.getElementById('new-task').value = '';
+    document.getElementById('task-date').value = '';
 }
 
-function editTask(taskId) {
-    const task = tasks.find(t => t.id === taskId);
+function editTask(id) {
+    const task = tasks.find(t => t.id === id);
     if (!task) return;
 
-    const taskText = prompt('Edit task:', task.text);
-    if (taskText !== null && taskText !== '') {
-        task.text = taskText;
+    const newText = prompt('Edit task:', task.text);
+    if (newText !== null && newText.trim() !== '') {
+        task.text = newText;
         saveTasks();
         renderTasks();
     }
 }
 
-function completeTask(taskId) {
-    const task = tasks.find(t => t.id === taskId);
+function completeTask(id) {
+    const task = tasks.find(t => t.id === id);
     if (task) {
         task.completed = !task.completed;
         saveTasks();
@@ -48,35 +53,33 @@ function completeTask(taskId) {
     }
 }
 
-function deleteTask(taskId) {
-    tasks = tasks.filter(t => t.id !== taskId);
+function deleteTask(id) {
+    if (!confirm('Are you sure you want to delete this task?')) return;
+
+    tasks = tasks.filter(t => t.id !== id);
     saveTasks();
     renderTasks();
 }
 
+function clearCompleted() {
+    tasks = tasks.filter(t => !t.completed);
+    saveTasks();
+    renderTasks();
+}
+
+function searchTasks() {
+    const keyword = document.getElementById('search-input').value.toLowerCase();
+    const filtered = tasks.filter(t => t.text.toLowerCase().includes(keyword));
+    renderTasks(filtered);
+}
+
 function filterTasks(filter) {
-    const taskList = document.getElementById('task-list');
-    taskList.innerHTML = '';
+    let filtered = tasks;
 
-    tasks.forEach(task => {
-        let shouldDisplay = false;
-        switch (filter) {
-            case 'all':
-                shouldDisplay = true;
-                break;
-            case 'active':
-                shouldDisplay = !task.completed;
-                break;
-            case 'completed':
-                shouldDisplay = task.completed;
-                break;
-        }
+    if (filter === 'active') filtered = tasks.filter(t => !t.completed);
+    if (filter === 'completed') filtered = tasks.filter(t => t.completed);
 
-        if (shouldDisplay) {
-            const li = createTaskElement(task);
-            taskList.appendChild(li);
-        }
-    });
+    renderTasks(filtered);
 }
 
 function saveTasks() {
@@ -84,98 +87,62 @@ function saveTasks() {
 }
 
 function loadTasks() {
-    tasks = JSON.parse(localStorage.getItem('tasks')) || [];
     renderTasks();
 }
 
-function renderTasks() {
+function renderTasks(list = tasks) {
     const taskList = document.getElementById('task-list');
     taskList.innerHTML = '';
-    tasks.forEach(task => {
+
+    list.forEach(task => {
         const li = createTaskElement(task);
         taskList.appendChild(li);
     });
-}
 
-function createTaskElement(task) {
-    const li = document.createElement('li');
-    li.innerHTML = `
-        ${task.text}
-        <div>
-            <button class="edit-btn">edit✏️</button>
-            <button class="complete-btn">completed✔️</button>
-            <button class="delete-btn">delete❌</button>
-        </div>
-    `;
-    li.className = task.completed ? 'completed' : '';
-
-    li.querySelector('.edit-btn').addEventListener('click', () => editTask(task.id));
-    li.querySelector('.complete-btn').addEventListener('click', () => completeTask(task.id));
-    li.querySelector('.delete-btn').addEventListener('click', () => deleteTask(task.id));
-
-    return li;
-}
-window.addEventListener('load', () => {
-    loadTasks();
-    
-    // Initialize SortableJS on the task list
-    const taskList = document.getElementById('task-list');
     Sortable.create(taskList, {
         animation: 150,
-        onEnd: updateTaskOrder // Update the task order when dragging ends
+        onEnd: updateTaskOrder
     });
-});
-
-function updateTaskOrder() {
-    const taskList = document.getElementById('task-list');
-    const updatedTasks = [];
-    
-    // Reorder the tasks array based on the new order in the DOM
-    taskList.querySelectorAll('li').forEach((li, index) => {
-        const taskId = li.getAttribute('data-id');
-        const task = tasks.find(t => t.id == taskId);
-        if (task) {
-            updatedTasks.push(task);
-        }
-    });
-    
-    tasks = updatedTasks;
-    saveTasks();
 }
 
-// Ensure each task has a data-id attribute
 function createTaskElement(task) {
     const li = document.createElement('li');
-    li.setAttribute('data-id', task.id); // Add a data-id attribute for identification
-    li.innerHTML = `
-        ${task.text}
-        <div>
-            <button class="edit-btn">edit✏️</button>
-            <button class="complete-btn">completed✔️</button>
-            <button class="delete-btn">delete❌</button>
-           
-        </div>
-       
-    `;
+    li.setAttribute('data-id', task.id);
     li.className = task.completed ? 'completed' : '';
+
+    li.innerHTML = `
+        <span>${task.text}</span>
+
+        <span class="priority-badge priority-${task.priority}">
+            ${task.priority}
+        </span>
+
+        ${task.date ? `<span class="task-date">${task.date}</span>` : ''}
+
+        <div>
+            <button class="edit-btn">✏️</button>
+            <button class="complete-btn">✔️</button>
+            <button class="delete-btn">❌</button>
+        </div>
+    `;
 
     li.querySelector('.edit-btn').addEventListener('click', () => editTask(task.id));
     li.querySelector('.complete-btn').addEventListener('click', () => completeTask(task.id));
     li.querySelector('.delete-btn').addEventListener('click', () => deleteTask(task.id));
-   
 
     return li;
 }
 
+function updateTaskOrder() {
+    const items = document.querySelectorAll('#task-list li');
+    const newOrder = [];
 
-Sortable.create(taskList, {
-    animation: 150,
-    onEnd: updateTaskOrder,
-    onStart: function(evt) {
-        evt.item.classList.add('dragging');
-    },
-    onEnd: function(evt) {
-        evt.item.classList.remove('dragging');
-        updateTaskOrder();
-    }
-});
+    items.forEach(li => {
+        const id = li.getAttribute('data-id');
+        const task = tasks.find(t => t.id == id);
+        if (task) newOrder.push(task);
+    });
+
+    tasks = newOrder;
+    saveTasks();
+}
