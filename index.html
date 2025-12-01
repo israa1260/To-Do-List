@@ -11,29 +11,61 @@
 <body>
 
     <div class="todo-container">
-        <h2>To-Do List</h2>
+        <div class="header-section">
+            <h2>To-Do List</h2>
+            <button id="dark-mode-toggle" class="dark-mode-btn" title="Toggle Dark Mode">🌙</button>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-container">
+            <div class="stat-item">
+                <span class="stat-label">Total:</span>
+                <span class="stat-value" id="total-count">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Active:</span>
+                <span class="stat-value" id="active-count">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Completed:</span>
+                <span class="stat-value" id="completed-count">0</span>
+            </div>
+        </div>
 
         <!-- Search -->
         <input type="text" id="search-input" placeholder="Search tasks..." class="search-box">
 
         <div class="input-container">
-            <input type="text" id="new-task" placeholder="Add a new task">
+            <input type="text" id="new-task" placeholder="Add a new task (Press Enter)">
             <input type="date" id="task-date">
-
+            <input type="text" id="task-category" placeholder="Category (optional)">
             <select id="task-priority">
                 <option value="Low">Low</option>
                 <option value="Medium">Medium</option>
                 <option value="High">High</option>
             </select>
-
             <button id="add-btn">Add</button>
         </div>
 
+        <div class="input-container">
+            <textarea id="task-description" placeholder="Task description (optional)" rows="2"></textarea>
+        </div>
+
         <div class="filter-container">
-            <button class="filter-btn" id="all-btn">All</button>
+            <button class="filter-btn active" id="all-btn">All</button>
             <button class="filter-btn" id="active-btn">Active</button>
             <button class="filter-btn" id="completed-btn">Completed</button>
             <button class="filter-btn" id="clear-completed-btn">Clear Completed</button>
+        </div>
+
+        <div class="sort-container">
+            <label for="sort-select">Sort by:</label>
+            <select id="sort-select">
+                <option value="date">Date</option>
+                <option value="priority">Priority</option>
+                <option value="name">Name</option>
+                <option value="category">Category</option>
+            </select>
         </div>
 
         <ul id="task-list"></ul>
